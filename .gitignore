@@ -1,0 +1,12 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+PRIVATE_*
+*Handoff*.zip
+backend/target/
+.brse-tools/
+.brse-m2/

@@ -1,0 +1,53 @@
+{
+  "id": "csv-change-v1",
+  "title": "Yêu cầu xuất CSV gấp",
+  "brief": "Bạn là BrSE của hệ thống quản lý đơn hàng. Khách muốn CSV vào thứ Sáu. Đây là dự án giả lập; chưa có cam kết lịch trước cuộc trao đổi.",
+  "teamUpdate": "Thông tin mô phỏng từ nhóm sau bước làm rõ: bản đầy đủ cần 3 ngày làm việc và thêm 1 ngày kiểm thử. Có thể thử phương án tối đa 100 dòng/người, 3 cột và chỉ đơn của bản thân trong 1 ngày triển khai + 1 ngày kiểm thử, nếu scope được xác nhận trong hôm nay. Chưa xác minh hiệu năng toàn bộ dữ liệu; cần khách kiểm tra dữ liệu mẫu trước phát hành.",
+  "turns": [
+    {
+      "id": "scenario-csv-hearing-v1",
+      "track": "BRSE",
+      "title": "CSV · Làm rõ yêu cầu",
+      "topic": "CSV liên tục",
+      "japanese": "注文一覧をCSVで出力できるように、今週金曜日までに追加できますか。営業部で使いたいです。",
+      "variant": "営業部向けに注文一覧のCSV出力が必要です。今週金曜日のリリースに入れられますか。",
+      "intent": "Hỏi rõ người dùng, cột dữ liệu, quyền truy cập và ưu tiên trước khi hứa lịch.",
+      "hints": [
+        "Hỏi cột dữ liệu và phạm vi đơn hàng cần xuất.",
+        "Xác nhận ai có quyền tải, dữ liệu cá nhân và ưu tiên.",
+        "Hẹn thời điểm phản hồi sau khi kiểm tra với nhóm."
+      ],
+      "followUp": "出力する項目と、利用する方の権限を確認してもよろしいでしょうか。"
+    },
+    {
+      "id": "scenario-csv-impact-v1",
+      "track": "BRSE",
+      "title": "CSV · Báo cáo tác động",
+      "topic": "CSV liên tục",
+      "japanese": "出力項目は注文番号・注文日・合計金額です。営業担当者本人の注文だけで構いません。全件出力でなくても、金曜日に使い始める方法はありますか。",
+      "variant": "注文番号、注文日、合計金額を、営業担当者自身の注文に限定して出力したいです。金曜日に使える代案を相談できますか。",
+      "intent": "Dựa vào kiểm tra của nhóm, đề xuất phương án có điều kiện; không bịa khách đã đồng ý.",
+      "hints": [
+        "Tóm tắt phạm vi khách vừa xác nhận và nhắc điều còn chưa rõ.",
+        "Nêu ước lượng và rủi ro theo thông tin mô phỏng đã cho.",
+        "Đề xuất chọn thử nghiệm giới hạn hoặc dời lịch, xin khách xác nhận."
+      ],
+      "followUp": "まずは一人当たり百件までの試行版にする案はいかがでしょうか。"
+    },
+    {
+      "id": "scenario-csv-agreement-v1",
+      "track": "BRSE",
+      "title": "CSV · Chốt xác nhận",
+      "topic": "CSV liên tục",
+      "japanese": "金曜日は一人百件までの試行版を希望します。正式版の日程は別途相談しましょう。試行版の確認方法と次の連絡予定をまとめてもらえますか。",
+      "variant": "金曜日の試行は担当者ごとに百件まででお願いします。確認する条件と、次回の報告予定を整理してください。",
+      "intent": "Tóm tắt thỏa thuận theo dữ kiện mới; xác nhận người phụ trách, nghiệm thu và mốc cập nhật.",
+      "hints": [
+        "Ghi rõ phạm vi ba cột, chỉ đơn của bản thân, tối đa 100 dòng/người.",
+        "Đề nghị kiểm tra dữ liệu/đúng quyền với người đại diện phía khách.",
+        "Đề xuất đầu mối và mốc phản hồi cần xác nhận; lịch bản chính thức chưa chốt."
+      ],
+      "followUp": "この内容で認識の相違がないか、ご確認いただけますでしょうか。"
+    }
+  ]
+}

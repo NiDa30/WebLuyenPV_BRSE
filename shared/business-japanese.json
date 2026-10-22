@@ -1,0 +1,11 @@
+[
+ {"id":"authored-tantou-v1","term":"担当","reading":"たんとう","senses":["Phụ trách một công việc hoặc phạm vi cụ thể."],"businessExample":"この機能の担当範囲を確認させてください。","usageNote":"Khi nói về kinh nghiệm, chỉ nêu phần thực sự do bạn phụ trách."},
+ {"id":"authored-youken-v1","term":"要件","reading":"ようけん","senses":["Yêu cầu cần được làm rõ và thống nhất cho hệ thống hoặc nghiệp vụ."],"businessExample":"要件の優先順位を確認してもよろしいでしょうか。","usageNote":"Phân biệt mong muốn, yêu cầu đã xác nhận và giả định chưa kiểm chứng."},
+ {"id":"authored-shiyou-v1","term":"仕様","reading":"しよう","senses":["Đặc tả về hành vi và điều kiện của chức năng."],"businessExample":"この条件での動作は、仕様書と一致していますか。","usageNote":"Nêu rõ phiên bản hoặc điều kiện đang đối chiếu khi xác nhận đặc tả."},
+ {"id":"authored-shinchoku-v1","term":"進捗","reading":"しんちょく","senses":["Tiến độ thực hiện công việc."],"businessExample":"進捗と残っている課題を共有します。","usageNote":"Báo cáo cả phần đã xong, phần còn lại và trở ngại có căn cứ."},
+ {"id":"authored-kakunin-v1","term":"確認","reading":"かくにん","senses":["Kiểm tra hoặc xác nhận lại thông tin."],"businessExample":"認識に相違がないか、確認させてください。","usageNote":"Nói rõ đối tượng cần xác nhận; tránh dùng câu chung chung thay cho câu hỏi cụ thể."},
+ {"id":"authored-eikyou-v1","term":"影響","reading":"えいきょう","senses":["Ảnh hưởng hoặc tác động tới chức năng, dữ liệu, phạm vi hoặc lịch."],"businessExample":"変更による影響範囲を調べてから、回答します。","usageNote":"Nếu chưa điều tra, nêu đó là điều cần xác minh thay vì kết luận chắc chắn."},
+ {"id":"authored-fuguai-v1","term":"不具合","reading":"ふぐあい","senses":["Lỗi hoặc hành vi không đáp ứng kỳ vọng đã thống nhất."],"businessExample":"不具合が発生した手順と時刻を教えていただけますか。","usageNote":"Thu thập dữ kiện trước khi khẳng định nguyên nhân hoặc thời gian khắc phục."},
+ {"id":"authored-taian-v1","term":"代案","reading":"だいあん","senses":["Phương án thay thế để cân nhắc khi cách ban đầu khó thực hiện."],"businessExample":"期限に間に合わない場合の代案も検討します。","usageNote":"Giải thích trade-off và phần cần khách hàng xác nhận, không tự ý đổi phạm vi."},
+ {"id":"authored-gijiroku-v1","term":"議事録","reading":"ぎじろく","senses":["Biên bản ghi lại thảo luận, quyết định và hành động sau cuộc họp."],"businessExample":"決定事項と担当者を議事録にまとめます。","usageNote":"Phân biệt quyết định đã thống nhất với vấn đề chưa chốt; ghi người phụ trách và hạn phản hồi."}
+]

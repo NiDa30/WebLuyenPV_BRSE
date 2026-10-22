@@ -1,0 +1,53 @@
+{
+  "id": "production-incident-v1",
+  "title": "Sự cố lưu đơn production",
+  "brief": "Tình huống giả lập: bạn là BrSE của hệ thống quản lý đơn hàng. Vào10:00 có phản ánh một số người không lưu được đơn. Chưa có nguyên nhân hoặc giờ khôi phục được xác nhận; không thực hiện thao tác trên hệ thống thật.",
+  "teamUpdate": "Thông tin giả lập sau bước tiếp nhận: nhóm thấy request lưu đơn bị timeout với ba tài khoản; chức năng xem danh sách vẫn hoạt động. Chưa xác định nguyên nhân gốc, chưa loại trừ ghi trùng khi thử lưu lại, chưa có ETA phục hồi. Nhóm đang đối chiếu log và trạng thái giao dịch; đề xuất tạm hạn chế lưu lại trong lúc xác minh. Chưa được coi timeout là bằng chứng mất dữ liệu.",
+  "turns": [
+    {
+      "id": "scenario-incident-intake-v1",
+      "track": "BRSE",
+      "title": "Production · Tiếp nhận ảnh hưởng",
+      "topic": "Production liên tục",
+      "japanese": "本日十時から、一部の営業担当者が注文を保存できません。至急確認してください。",
+      "variant": "十時ごろから注文保存に失敗する担当者がいます。まず何を確認しますか。",
+      "intent": "Xác nhận phạm vi, triệu chứng và mức ảnh hưởng; không kết luận nguyên nhân khi chưa có dữ kiện.",
+      "hints": [
+        "Hỏi tài khoản bị ảnh hưởng, thao tác, thời điểm và thông báo lỗi.",
+        "Xác nhận các tác vụ còn dùng được và mức khẩn cấp.",
+        "Nêu đầu mối kiểm tra và đề xuất mốc cập nhật, chưa hứa thời gian khắc phục."
+      ],
+      "followUp": "影響を受けている利用者と、表示されるエラーメッセージを教えていただけますか。"
+    },
+    {
+      "id": "scenario-incident-update-v1",
+      "track": "BRSE",
+      "title": "Production · Báo cáo chưa rõ nguyên nhân",
+      "topic": "Production liên tục",
+      "japanese": "営業三名で保存時にタイムアウトしています。一覧の閲覧はできます。原因と復旧予定を、現時点で分かる範囲で教えてください。",
+      "variant": "三名が保存時にタイムアウトし、閲覧は可能です。調査状況と、復旧の見通しについて説明してください。",
+      "intent": "Phân biệt dữ kiện và giả thuyết; báo cáo điều tra/giảm ảnh hưởng mà chưa hứa ETA.",
+      "hints": [
+        "Tóm tắt 3 người, lỗi timeout khi lưu và vẫn xem được danh sách.",
+        "Nêu kết quả nhóm đã xác nhận cùng điều chưa xác minh.",
+        "Xin khách tạm tránh thao tác có rủi ro trùng và hẹn mốc cập nhật cần thống nhất."
+      ],
+      "followUp": "原因と復旧時刻はまだ確定していません。次回の調査状況をご報告する時刻を調整させてください。"
+    },
+    {
+      "id": "scenario-incident-plan-v1",
+      "track": "BRSE",
+      "title": "Production · Thống nhất cập nhật sự cố",
+      "topic": "Production liên tục",
+      "japanese": "保存の再実行は一旦控えます。次の報告は十時三十分にお願いします。確認事項と担当、未確定の点を整理してください。",
+      "variant": "重複を避けるため再保存を控えます。十時三十分の報告に向けて、担当者と調査内容、まだ分からない点をまとめてください。",
+      "intent": "Chốt hành động tạm thời, người phụ trách và báo cáo10:30; không gọi đó là giờ phục hồi.",
+      "hints": [
+        "Tóm tắt tạm hạn chế lưu lại, không nói hệ thống đã khôi phục.",
+        "Phân công đầu mối kỹ thuật và liên lạc dưới dạng đề xuất cần xác nhận.",
+        "Ghi rõ nguyên nhân, nguy cơ trùng và ETA chưa xác định;10:30 là giờ cập nhật."
+      ],
+      "followUp": "十時三十分は復旧の確約ではなく、次回の状況報告時刻としてよろしいでしょうか。"
+    }
+  ]
+}

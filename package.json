@@ -1,0 +1,33 @@
+{
+  "name": "brse-interview-trainer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vue-tsc --noEmit && vite build",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "preview": "vite preview --host 0.0.0.0",
+    "api:dev": "./scripts/maven.sh -B -f backend/pom.xml spring-boot:run",
+    "test:api": "./scripts/maven.sh -B -f backend/pom.xml test",
+    "build:api": "./scripts/maven.sh -B -f backend/pom.xml package"
+  },
+  "dependencies": {
+    "vue": "^3.5.22",
+    "pinia": "^3.0.3",
+    "idb": "^8.0.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.1.12",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "vue-tsc": "^3.1.1",
+    "vitest": "^3.2.4",
+    "@playwright/test": "^1.56.1",
+    "fake-indexeddb": "^6.2.4",
+    "@types/node": "^24.9.1"
+  }
+}

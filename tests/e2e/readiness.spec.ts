@@ -1,0 +1,25 @@
+import {test,expect} from '@playwright/test'
+test('readiness persists, rejects invalid import, exports and resets without device permissions',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'Checklist phỏng vấn',exact:true}).click()
+ await expect(page.getByRole('heading',{name:'0 / 10 mục tự xác nhận'})).toBeVisible()
+ await page.getByLabel('Đã thử nghe và nói bằng thiết bị sẽ dùng',{exact:true}).check()
+ await expect(page.getByRole('heading',{name:'1 / 10 mục tự xác nhận'})).toBeVisible()
+ await page.getByLabel('Ghi chú chuẩn bị',{exact:true}).fill('Thử tai nghe trước 15 phút')
+ await page.getByLabel('Đã chuẩn bị nguồn điện và tắt thông báo',{exact:true}).check();await expect(page.getByLabel('Ghi chú chuẩn bị',{exact:true})).toHaveValue('Thử tai nghe trước 15 phút');await page.getByLabel('Đã chuẩn bị nguồn điện và tắt thông báo',{exact:true}).uncheck();
+ await page.getByRole('button',{name:'Lưu ghi chú',exact:true}).click();await expect(page.getByRole('status')).toHaveText('Đã lưu trên thiết bị.')
+ await page.reload();await page.getByRole('button',{name:'Checklist phỏng vấn',exact:true}).click()
+ await expect(page.getByLabel('Ghi chú chuẩn bị',{exact:true})).toHaveValue('Thử tai nghe trước 15 phút')
+ await page.getByLabel('Nhập checklist JSON').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{}')})
+ await expect(page.getByRole('status')).toContainText('Backup không hợp lệ')
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:'Xuất checklist JSON'}).click();const file=await download;const stream=await file.createReadStream();const chunks=[];for await(const chunk of stream!)chunks.push(chunk);const backup=Buffer.concat(chunks)
+ expect(JSON.parse(backup.toString()).checked).toEqual(['audio'])
+ page.on('dialog',d=>d.accept());await page.getByRole('button',{name:'Chuẩn bị lại',exact:true}).click();await expect(page.getByRole('heading',{name:'0 / 10 mục tự xác nhận'})).toBeVisible()
+ await page.getByLabel('Nhập checklist JSON').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:backup});await expect(page.getByRole('heading',{name:'1 / 10 mục tự xác nhận'})).toBeVisible()
+})
+test('failed readiness write leaves checkbox unconfirmed and allows retry',async({page})=>{
+ await page.addInitScript(()=>{const original=IDBObjectStore.prototype.put;let fail=true;IDBObjectStore.prototype.put=function(...args:Parameters<IDBObjectStore['put']>){if(this.name==='state'&&fail){fail=false;throw new DOMException('Fixture storage failure','QuotaExceededError')}return original.apply(this,args)}})
+ await page.goto('/');await page.getByRole('button',{name:'Checklist phỏng vấn',exact:true}).click()
+ const checkbox=page.getByLabel('Đã thử nghe và nói bằng thiết bị sẽ dùng',{exact:true})
+ await checkbox.click();await expect(page.getByRole('status')).toContainText('Không lưu được');await expect(checkbox).not.toBeChecked();await expect(page.getByRole('heading',{name:'0 / 10 mục tự xác nhận'})).toBeVisible()
+ await checkbox.check();await expect(page.getByRole('heading',{name:'1 / 10 mục tự xác nhận'})).toBeVisible()
+})

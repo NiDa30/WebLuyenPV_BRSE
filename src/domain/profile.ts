@@ -1,0 +1,22 @@
+import {z} from 'zod'
+export const careerTargets=['Chưa chọn','Web Engineer','IT Engineer','SE','BrSE','BA','PM'] as const
+const time=z.number().int().min(0).max(8e15)
+export const projectSchema=z.object({id:z.string().uuid(),title:z.string().trim().min(1).max(120),role:z.string().trim().max(300),stack:z.string().trim().max(300),context:z.string().trim().max(2000),result:z.string().trim().max(2000)}).strict()
+const claimSchema=z.object({id:z.string().uuid(),kind:z.enum(['EXPERIENCE','SKILL','RESULT']),text:z.string().trim().min(1).max(1000),version:z.number().int().positive(),source:z.enum(['MANUAL','CV_TEXT']),sourceVersion:z.number().int().positive().nullable(),quote:z.string().max(1000),updatedAt:time,confirmedAt:time.nullable()}).strict().superRefine((c,ctx)=>{if(c.source==='MANUAL'&&(c.sourceVersion!==null||c.quote!=='')||c.source==='CV_TEXT'&&(c.sourceVersion===null||!c.quote.trim())||c.confirmedAt!==null&&c.confirmedAt<c.updatedAt)ctx.addIssue({code:'custom',message:'Nguồn/xác nhận claim không hợp lệ.'})})
+export const profileSchema=z.object({format:z.literal('BRSE_PROFILE_BACKUP'),schemaVersion:z.literal(1),alias:z.string().trim().max(120),careerTarget:z.enum(careerTargets),japaneseSelfReport:z.string().trim().max(300),sourceText:z.string().max(30000),sourceVersion:z.number().int().positive(),projects:z.array(projectSchema).max(10),claims:z.array(claimSchema).max(30),updatedAt:time.nullable()}).strict().superRefine((p,ctx)=>{if(new Set(p.projects.map(x=>x.id)).size!==p.projects.length||new Set(p.claims.map(x=>x.id)).size!==p.claims.length||p.claims.some(c=>c.source==='CV_TEXT'&&(c.sourceVersion!>p.sourceVersion||c.sourceVersion===p.sourceVersion&&!p.sourceText.includes(c.quote))))ctx.addIssue({code:'custom',message:'ID trùng hoặc chứng cứ CV không khớp phiên bản.'})})
+export type Profile=z.infer<typeof profileSchema>
+export type ProfileClaim=Profile['claims'][number]
+export type ProfileProject=Profile['projects'][number]
+export const emptyProfile=():Profile=>({format:'BRSE_PROFILE_BACKUP',schemaVersion:1,alias:'',careerTarget:'Chưa chọn',japaneseSelfReport:'',sourceText:'',sourceVersion:1,projects:[],claims:[],updatedAt:null})
+export function parseProfile(text:string){if(new TextEncoder().encode(text).length>1_000_000)throw Error('Backup vượt 1 MB.');return profileSchema.parse(JSON.parse(text))}
+export function claimState(p:Profile,c:ProfileClaim){return c.source==='CV_TEXT'&&c.sourceVersion!==p.sourceVersion?'STALE_SOURCE':c.confirmedAt!==null?'SELF_CONFIRMED':'UNCONFIRMED'}
+export function saveProfileBasics(p:Profile,alias:string,careerTarget:Profile['careerTarget'],japaneseSelfReport:string,now:number){return profileSchema.parse({...p,alias,careerTarget,japaneseSelfReport,updatedAt:now})}
+export function saveProfileText(p:Profile,text:string,now:number){return profileSchema.parse({...p,sourceText:text,sourceVersion:p.sourceVersion+(text!==p.sourceText?1:0),claims:text===p.sourceText?p.claims:p.claims.map(c=>c.source==='CV_TEXT'?{...c,confirmedAt:null}:c),updatedAt:now})}
+export function saveProfileProject(p:Profile,project:ProfileProject,now:number){const exists=p.projects.some(x=>x.id===project.id);return profileSchema.parse({...p,projects:exists?p.projects.map(x=>x.id===project.id?project:x):[project,...p.projects],updatedAt:now})}
+export function saveProfileClaim(p:Profile,input:Pick<ProfileClaim,'kind'|'text'|'source'|'quote'>,now:number,id:string=crypto.randomUUID()){
+ const old=p.claims.find(c=>c.id===id),sourceVersion=input.source==='CV_TEXT'?p.sourceVersion:null,quote=input.source==='CV_TEXT'?input.quote:''
+ if(old&&old.kind===input.kind&&old.text===input.text.trim()&&old.source===input.source&&old.quote===quote&&old.sourceVersion===sourceVersion)return p
+ return profileSchema.parse({...p,claims:[{...input,quote,id,sourceVersion,version:(old?.version??0)+1,updatedAt:now,confirmedAt:null},...p.claims.filter(c=>c.id!==id)],updatedAt:now})
+}
+export function confirmProfileClaim(p:Profile,id:string,now:number){const claim=p.claims.find(c=>c.id===id);if(!claim||claimState(p,claim)==='STALE_SOURCE')throw Error('Rà soát nguồn CV và lưu lại claim trước khi xác nhận.');return profileSchema.parse({...p,claims:p.claims.map(c=>c.id===id?{...c,confirmedAt:now}:c),updatedAt:now})}
+export function unconfirmProfileClaim(p:Profile,id:string,now:number){return profileSchema.parse({...p,claims:p.claims.map(c=>c.id===id?{...c,confirmedAt:null}:c),updatedAt:now})}

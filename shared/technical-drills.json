@@ -1,0 +1,140 @@
+[
+  {
+    "id": "tech-api-retry-v1",
+    "track": "JOB",
+    "title": "API: retry không tạo đơn trùng",
+    "topic": "API",
+    "japanese": "注文作成APIで、応答がタイムアウトしました。クライアントが再送すると二重注文になる可能性があります。安全な再送とサーバー側の処理をどう設計し、確認しますか。",
+    "variant": "注文APIの応答が届かず、利用者がもう一度送信しました。重複注文を防ぐ仕組みと、失敗時の確認方法を説明してください。",
+    "intent": "Giải thích ranh giới timeout, idempotency và kiểm thử; không tự nhận đã triển khai nếu chưa có trải nghiệm.",
+    "hints": [
+      "Phân biệt không nhận response với server chưa xử lý; nêu giả định về request/order ID.",
+      "Thảo luận idempotency key, unique constraint/transaction và việc trả lại kết quả trước đó; chỉ disable nút không đủ.",
+      "Nêu tình huống concurrent requests, timeout sau commit và cách kiểm thử/quan sát không lộ dữ liệu."
+    ],
+    "followUp": "同じキーで異なる内容が送られた場合、どのように扱いますか。",
+    "referencePoints": [
+      "Timeout không chứng minh giao dịch thất bại; kiểm tra trạng thái xử lý trước khi khẳng định.",
+      "Idempotency cần xác định phạm vi key, payload consistency, trạng thái đang xử lý và chính sách lưu kết quả/TTL.",
+      "Unique constraint và transaction hỗ trợ tính nhất quán nhưng không tự xử lý mọi tác động ngoài DB; cần bàn về side effects.",
+      "Kiểm thử concurrent retry, mất response sau commit và phản hồi lỗi; không kết luận đúng chỉ vì nêu từ khóa."
+    ],
+    "stack": "General backend",
+    "level": "PHAN_TICH"
+  },
+  {
+    "id": "tech-sql-pagination-v1",
+    "track": "JOB",
+    "title": "SQL: phân trang ổn định và đo truy vấn",
+    "topic": "SQL",
+    "japanese": "注文一覧をcreated_atの降順で表示しています。同じ時刻の注文があり、ページ移動中にもデータが追加されます。順序の安定性と検索性能をどう確認し、改善しますか。",
+    "variant": "注文データが増える一覧画面で、ページ間の重複や抜け、遅い検索が報告されました。並び順、ページング、調査方法を説明してください。",
+    "intent": "Nêu giả định về dữ liệu thay đổi, thứ tự xác định và bằng chứng đo hiệu năng; không bịa EXPLAIN hoặc benchmark.",
+    "hints": [
+      "Bổ sung tie-breaker duy nhất như ID cho thứ tự created_at; xác định yêu cầu nhất quán khi dữ liệu thay đổi.",
+      "So sánh offset và cursor/keyset, điều kiện lọc, hướng sort, key null và giới hạn từng cách.",
+      "Đề xuất index dựa trên workload; dùng kế hoạch thực thi/dữ liệu đại diện để đo trước/sau, không bảo đảm index luôn nhanh."
+    ],
+    "followUp": "検索条件が変わった場合、カーソルはそのまま使えますか。",
+    "referencePoints": [
+      "Thứ tự cần deterministic, ví dụ created_at và ID; index không thay thế ORDER BY.",
+      "Keyset cần cursor phù hợp filter/sort và điều kiện so sánh; không tự đảm bảo snapshot bất biến khi bản ghi bị sửa/xóa.",
+      "Offset đơn giản nhưng trang sâu và insert/delete có thể ảnh hưởng hiệu năng/độ ổn định; nêu trade-off theo yêu cầu.",
+      "EXPLAIN/ANALYZE tùy hệ DB có thể thực thi truy vấn; chỉ đo trên môi trường/dữ liệu được phép, ghi rõ chưa đo nếu thiếu bằng chứng."
+    ],
+    "stack": "SQL chung",
+    "level": "PHAN_TICH"
+  },
+  {
+    "id": "tech-security-authz-v1",
+    "track": "JOB",
+    "title": "Security: quyền truy cập từng đơn hàng",
+    "topic": "Security",
+    "japanese": "ログイン済みの利用者が注文詳細APIを呼び出します。注文IDを変更しても、他人の注文を読めないようにするには、どこで何を確認し、どのようにテストしますか。",
+    "variant": "認証済みの利用者から注文IDを受け取るAPIがあります。他の利用者や別テナントのデータへのアクセスを防ぐ設計と検証を説明してください。",
+    "intent": "Phân biệt authentication và authorization, kiểm tra quyền ở server theo object/tenant; chỉ thảo luận và kiểm thử defensive trong phạm vi được phép.",
+    "hints": [
+      "Lấy identity/tenant từ ngữ cảnh được server tin cậy, không tin userId/tenantId tự khai trong request.",
+      "Kiểm tra ownership/role/policy phía server ở mọi đường truy cập; không coi UUID, UI ẩn nút hay đã đăng nhập là đủ.",
+      "Đề xuất test user A/B, tenant A/B, quyền đọc/ghi khác nhau, log tối thiểu và không trả dữ liệu nhạy cảm khi từ chối."
+    ],
+    "followUp": "管理者の例外権限は、どのように明示して監査しますか。",
+    "referencePoints": [
+      "Authentication xác nhận danh tính, authorization quyết định quyền với resource cụ thể; cần cả hai.",
+      "Ràng buộc ownership/tenant ở server và policy nhất quán, bao gồm endpoint ghi/batch/export nếu có; mặc định từ chối.",
+      "UUID khó đoán không thay kiểm tra quyền. Không tin identity do client gửi mà chưa xác minh.",
+      "Kiểm thử quyền trên fixture/tài khoản được phép, gồm deny và allow; phản hồi/log không rò dữ liệu, không tự nhận đã audit bảo mật."
+    ],
+    "stack": "General backend",
+    "level": "UNG_DUNG"
+  },
+  {
+    "id": "tech-vue-async-v1",
+    "track": "JOB",
+    "title": "Vue: kết quả tìm kiếm về sai thứ tự",
+    "topic": "API",
+    "stack": "Vue 3",
+    "level": "UNG_DUNG",
+    "japanese": "Vueの検索画面で、入力が変わるたびにAPIを呼び出します。古いリクエストの応答が後から届き、画面が古い結果に戻る問題をどう防ぎ、テストしますか。",
+    "variant": "Vue画面で連続検索すると応答順が入れ替わります。表示する結果の選択、ローディング、エラーの扱いを説明してください。",
+    "intent": "Giải thích state của request và kết quả mới nhất; phân biệt phương án đề xuất với code đã kiểm thử.",
+    "hints": [
+      "Xác định request nào còn hợp lệ theo query/version hiện tại.",
+      "Có thể hủy request nhưng vẫn cần guard response/state theo identity; cleanup khi rời component.",
+      "Kiểm thử bằng deferred promises, đảo thứ tự resolve/reject và trạng thái loading/error."
+    ],
+    "followUp": "古いリクエストのエラーが後から届いた場合、画面には何を表示しますか。",
+    "referencePoints": [
+      "Guard kết quả bằng request identity hoặc query version để response cũ không ghi đè state mới.",
+      "AbortController giảm công việc không cần thiết, nhưng không thay toàn bộ quy tắc chọn response còn hợp lệ.",
+      "Loading/error cũng cần thuộc request hiện hành; cleanup hoặc vô hiệu cập nhật khi component unmount.",
+      "Kiểm thử thứ tự resolve/reject đảo ngược bằng fixture, không tự khẳng định đã đúng chỉ vì có debounce."
+    ]
+  },
+  {
+    "id": "tech-spring-transaction-v1",
+    "track": "JOB",
+    "title": "Spring Boot: ranh giới transaction và tác động ngoài DB",
+    "topic": "API",
+    "stack": "Spring Boot",
+    "level": "PHAN_TICH",
+    "japanese": "Spring Bootの注文処理で、DB更新と外部サービスへの通知を行います。例外が発生した場合、どこまで戻せるか、トランザクション境界と検証方法を説明してください。",
+    "variant": "SpringのサービスでDB保存後に外部通知が失敗しました。DBと通知の整合性をどう考え、どのようにテストしますか。",
+    "intent": "Nêu rõ transaction thực sự bao phủ gì, không coi annotation là bảo đảm rollback mọi side effect.",
+    "hints": [
+      "Xác định transaction manager, lời gọi qua proxy và cấu hình rollback; không giả định mọi exception đều rollback.",
+      "Phân biệt DB rollback với HTTP/email đã gửi; thảo luận outbox hoặc cơ chế bù/idempotency theo yêu cầu.",
+      "Kiểm thử transaction thật, lỗi từng bước và hành vi commit; lưu ý self-invocation trong chế độ proxy."
+    ],
+    "followUp": "同じクラス内からトランザクション付きメソッドを呼ぶ場合、何に注意しますか。",
+    "referencePoints": [
+      "Trong chế độ proxy phổ biến, self-invocation không đi qua proxy nên cần xác minh boundary thực tế.",
+      "Rollback phụ thuộc cấu hình và loại exception; kiểm tra thay vì khẳng định mọi lỗi đều rollback.",
+      "Transaction DB không tự hoàn tác HTTP/email bên ngoài đã thành công.",
+      "Outbox/bù cần thiết kế vận hành và tính lặp an toàn; kiểm thử commit/failure chứ không chỉ mock repository."
+    ]
+  },
+  {
+    "id": "tech-postgres-plan-v1",
+    "track": "JOB",
+    "title": "PostgreSQL: đọc query plan trước khi thêm index",
+    "topic": "SQL",
+    "stack": "PostgreSQL",
+    "level": "UNG_DUNG",
+    "japanese": "PostgreSQLで、インデックスがあるのに一覧検索でSeq Scanが使われています。どの情報を確認して、問題かどうかを判断しますか。",
+    "variant": "PostgreSQLの検索が遅いと報告されました。実行計画、データ分布、統計情報をどう調べ、変更前後を比較しますか。",
+    "intent": "Đề xuất phép đo và giới hạn bằng chứng; không coi Seq Scan luôn sai hoặc index luôn nhanh.",
+    "hints": [
+      "Xem filter/sort/row estimates, phân bố dữ liệu và kích thước bảng; phân biệt estimated với actual.",
+      "Đọc EXPLAIN trước; EXPLAIN ANALYZE thực thi statement nên cần môi trường được phép và hiểu tác động.",
+      "So sánh workload/dataset đại diện trước/sau; cân nhắc chi phí ghi/storage khi thêm index."
+    ],
+    "followUp": "推定行数と実際の行数が大きく違う場合、何を確認しますか。",
+    "referencePoints": [
+      "Seq Scan có thể hợp lý với bảng nhỏ hoặc nhiều hàng được chọn; tên operator không tự chứng minh lỗi.",
+      "Estimates phụ thuộc statistics và phân bố; actual execution cung cấp bằng chứng khác estimated cost.",
+      "EXPLAIN ANALYZE thực thi statement, kể cả tác động nếu là DML; chỉ dùng ở môi trường/phạm vi phù hợp.",
+      "Index phải phục vụ predicate/order/workload thực tế và có chi phí ghi; ghi lại phép đo trước/sau, chưa đo thì nói chưa đo."
+    ]
+  }
+]

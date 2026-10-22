@@ -1,0 +1,29 @@
+name: Frontend and API checks
+on: [push, pull_request]
+jobs:
+  exam-slice:
+    runs-on: ubuntu-latest
+    env:
+      BRSE_TOOLS_DIR: ${{ runner.temp }}/brse-tools
+      BRSE_MAVEN_REPO: ${{ runner.temp }}/brse-m2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci
+      - run: npm run test:api
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-failure
+          path: test-results/
